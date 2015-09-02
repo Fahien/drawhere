@@ -1,6 +1,8 @@
 package me.fahien.android.drawhere.view;
 
 import android.content.Context;
+import android.graphics.Canvas;
+import android.graphics.Paint;
 import android.graphics.PointF;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
@@ -22,12 +24,14 @@ public class BoxDrawingView extends View {
 	private static final String TAG = BoxDrawingView.class.getSimpleName();
 
 	private Box currentBox;
-
 	/**
 	 * When user touches the view, a new box will be
 	 * created and added to the list of existing boxes
 	 */
 	private List<Box> boxList;
+
+	private Paint boxPaint;
+	private Paint backgroundPaint;
 
 	/**
 	 * Used when creating the view in code
@@ -42,6 +46,14 @@ public class BoxDrawingView extends View {
 	public BoxDrawingView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		boxList = new ArrayList<>();
+
+		// Paint the boxes a nice semitransparent red (ARGB)
+		boxPaint = new Paint();
+		boxPaint.setColor(0x22ff0000);
+
+		// Paint the background off-white
+		backgroundPaint = new Paint();
+		backgroundPaint.setColor(0xfff8efe0);
 	}
 
 	/**
@@ -84,5 +96,23 @@ public class BoxDrawingView extends View {
 		Log.i(TAG, action + " at x = " + current.x + ", y = " + current.y);
 
 		return true;
+	}
+
+	/**
+	 * Draws the boxes to the screen
+	 */
+	@Override
+	protected void onDraw(Canvas canvas) {
+		// Fill the background
+		canvas.drawPaint(backgroundPaint);
+
+		for (Box box : boxList) {
+			float left = Math.min(box.getOrigin().x, box.getCurrent().x);
+			float right = Math.max(box.getOrigin().x, box.getCurrent().x);
+			float top = Math.min(box.getOrigin().y, box.getCurrent().y);
+			float bottom = Math.max(box.getOrigin().y, box.getCurrent().y);
+
+			canvas.drawRect(left, top, right, bottom, boxPaint);
+		}
 	}
 }
